@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church Management System - User Manual</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, #3B82F6, #1E40AF);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .toc {
+            background: #F8FAFC;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border-left: 5px solid #3B82F6;
+        }
+
+        .toc h2 {
+            color: #1E40AF;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .toc li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #3B82F6;
+            font-weight: bold;
+        }
+
+        .toc a {
+            color: #374151;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            color: #3B82F6;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            page-break-inside: avoid;
+        }
+
+        .section h2 {
+            color: #1E40AF;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3B82F6;
+        }
+
+        .section h3 {
+            color: #374151;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+        }
+
+        .section h4 {
+            color: #4B5563;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: #F8FAFC;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #3B82F6;
+        }
+
+        .feature-card h4 {
+            color: #1E40AF;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .feature-card p {
+            color: #6B7280;
+            font-size: 0.95em;
+        }
+
+        .role-section {
+            background: #FEF3C7;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #F59E0B;
+        }
+
+        .role-section h4 {
+            color: #92400E;
+            margin-bottom: 15px;
+        }
+
+        .permissions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .permission {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .permission.allowed {
+            border-left: 4px solid #10B981;
+            background: #F0FDF4;
+        }
+
+        .permission.restricted {
+            border-left: 4px solid #EF4444;
+            background: #FEF2F2;
+        }
+
+        .permission.limited {
+            border-left: 4px solid #F59E0B;
+            background: #FFFBEB;
+        }
+
+        .step-list {
+            counter-reset: step-counter;
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .step-list li {
+            counter-increment: step-counter;
+            margin: 15px 0;
+            padding: 15px;
+            background: #F8FAFC;
+            border-radius: 8px;
+            position: relative;
+            padding-left: 60px;
+        }
+
+        .step-list li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            background: #3B82F6;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .warning {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-left: 4px solid #EF4444;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .warning h4 {
+            color: #DC2626;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-left: 4px solid #3B82F6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .info h4 {
+            color: #1E40AF;
+            margin-bottom: 10px;
+        }
+
+        .credentials-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .credentials-table th,
+        .credentials-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .credentials-table th {
+            background: #F9FAFB;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .credentials-table tr:hover {
+            background: #F9FAFB;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background: #F8FAFC;
+            border-radius: 10px;
+            color: #6B7280;
+        }
+
+        @media print {
+            body {
+                font-size: 12pt;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .header {
+                page-break-after: avoid;
+            }
+        }
+
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .module-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .module-card {
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .module-card:hover {
+            border-color: #3B82F6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .module-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+            width: auto;
+            height: auto;
+        }
+
+        .module-card h4 {
+            color: #1E40AF;
+            margin-bottom: 10px;
+        }
+
+        .subscription-info {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .subscription-info h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .price span {
+            font-size: 0.4em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⛪ Church Management System</h1>
+            <p>Complete User Manual & Feature Guide</p>
+            <p style="font-size: 1em; margin-top: 10px;">Version 1.0 | 2024</p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2>📋 Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">System Overview</a></li>
+                <li><a href="#subscription">Subscription System</a></li>
+                <li><a href="#roles">User Roles & Permissions</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#modules">Feature Modules</a></li>
+                <li><a href="#folders">Folders Module</a></li>
+                <li><a href="#pd-summary">PD Summary Module</a></li>
+                <li><a href="#calendar">Calendar Module</a></li>
+                <li><a href="#tasks">Tasks Module</a></li>
+                <li><a href="#newcomers">Newcomer Management</a></li>
+                <li><a href="#programs">Programs & Attendance</a></li>
+                <li><a href="#souls">Souls Won Tracker</a></li>
+                <li><a href="#history">History & Feedback</a></li>
+                <li><a href="#settings">Settings & Configuration</a></li>
+                <li><a href="#support">Support & Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <!-- System Overview -->
+        <div class="section" id="overview">
+            <h2>🏛️ System Overview</h2>
+            <p>The Church Management System is a comprehensive web application designed to streamline church operations, enhance communication, and improve member engagement. Built with modern web technologies, it provides role-based access control and a subscription-based activation system.</p>
+
+            <h3>🎯 Key Benefits</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔐 Secure Access Control</h4>
+                    <p>Role-based permissions ensure users only access appropriate features and data.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📱 Mobile-Responsive</h4>
+                    <p>Works seamlessly on desktop, tablet, and mobile devices.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🌍 Multi-Language</h4>
+                    <p>Supports multiple languages including English, German, French, Spanish, and Portuguese.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>☁️ Cloud-Ready</h4>
+                    <p>Designed for easy deployment and hosting on various platforms.</p>
+                </div>
+            </div>
+
+            <h3>🏗️ System Architecture</h3>
+            <p>The system is built using:</p>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Frontend:</strong> React with TypeScript</li>
+                <li><strong>Styling:</strong> Tailwind CSS</li>
+                <li><strong>Icons:</strong> Lucide React</li>
+                <li><strong>Storage:</strong> Local Storage (easily upgradeable to database)</li>
+                <li><strong>Authentication:</strong> Role-based access control</li>
+            </ul>
+        </div>
+
+        <!-- Subscription System -->
+        <div class="section" id="subscription">
+            <h2>💳 Subscription System</h2>
+            
+            <div class="subscription-info">
+                <h3>Monthly Subscription</h3>
+                <div class="price">$29<span>/month</span></div>
+                <p>Unlock all features for your church with our affordable monthly subscription</p>
+            </div>
+
+            <h3>🔑 How It Works</h3>
+            <ol class="step-list">
+                <li><strong>Pastor Registration:</strong> Only church Pastors can activate subscriptions</li>
+                <li><strong>Payment Processing:</strong> Secure payment through Stripe integration</li>
+                <li><strong>Instant Activation:</strong> Full app access immediately after payment</li>
+                <li><strong>Team Access:</strong> All church staff gain access once subscription is active</li>
+            </ol>
+
+            <div class="info">
+                <h4>💡 Important Notes</h4>
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>Only Pastors see payment screens and can manage subscriptions</li>
+                    <li>Workers and Members see a simple "activation required" message</li>
+                    <li>All church data is preserved during subscription periods</li>
+                    <li>Cancel anytime with no long-term commitments</li>
+                </ul>
+            </div>
+
+            <h3>✨ What's Included</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Complete Church Management</h4>
+                    <p>All modules and features included</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Unlimited Users</h4>
+                    <p>No limits on members, workers, or newcomers</p>
+                </div>
+                <div class="feature-card">
+                    <h4>24/7 Support</h4>
+                    <p>Priority customer support included</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Regular Updates</h4>
+                    <p>New features and improvements</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Roles -->
+        <div class="section" id="roles">
+            <h2>👥 User Roles & Permissions</h2>
+            <p>The system supports four distinct user roles, each with specific permissions and access levels:</p>
+
+            <div class="role-section">
+                <h4>🎖️ Pastor - Full Access</h4>
+                <p>Complete administrative control over all church operations and settings.</p>
+                <div class="permissions">
+                    <div class="permission allowed">✅ All Modules Access</div>
+                    <div class="permission allowed">✅ User Management</div>
+                    <div class="permission allowed">✅ Church Settings</div>
+                    <div class="permission allowed">✅ Subscription Management</div>
+                    <div class="permission allowed">✅ Data Export</div>
+                    <div class="permission allowed">✅ Task Assignment</div>
+                    <div class="permission allowed">✅ PD Directives</div>
+                    <div class="permission allowed">✅ All Reports</div>
+                </div>
+            </div>
+
+            <div class="role-section" style="background: #DBEAFE; border-left-color: #3B82F6;">
+                <h4>⚡ Worker - Mid-Level Access</h4>
+                <p>Operational access to manage day-to-day church activities and programs.</p>
+                <div class="permissions">
+                    <div class="permission allowed">✅ Folders Management</div>
+                    <div class="permission allowed">✅ PD Reports</div>
+                    <div class="permission allowed">✅ Calendar Events</div>
+                    <div class="permission allowed">✅ Task Management</div>
+                    <div class="permission allowed">✅ Attendance Tracking</div>
+                    <div class="permission allowed">✅ Souls Won Records</div>
+                    <div class="permission limited">⚠️ Limited Settings</div>
+                    <div class="permission restricted">❌ Subscription Access</div>
+                </div>
+            </div>
+
+            <div class="role-section" style="background: #F0FDF4; border-left-color: #10B981;">
+                <h4>👤 Member - View & Limited Input</h4>
+                <p>Access to personal information and church programs with limited editing capabilities.</p>
+                <div class="permissions">
+                    <div class="permission allowed">✅ Personal Profile</div>
+                    <div class="permission allowed">✅ Church Programs</div>
+                    <div class="permission allowed">✅ Calendar View</div>
+                    <div class="permission limited">⚠️ Own Attendance</div>
+                    <div class="permission limited">⚠️ Personal Notes</div>
+                    <div class="permission restricted">❌ User Management</div>
+                    <div class="permission restricted">❌ Settings Access</div>
+                    <div class="permission restricted">❌ Administrative Features</div>
+                </div>
+            </div>
+
+            <div class="role-section" style="background: #FEF3C7; border-left-color: #F59E0B;">
+                <h4>🆕 Newcomer - Basic Information</h4>
+                <p>Limited access focused on completing personal information and basic church interaction.</p>
+                <div class="permissions">
+                    <div class="permission allowed">✅ Personal Information Form</div>
+                    <div class="permission allowed">✅ Basic Profile</div>
+                    <div class="permission limited">⚠️ Church Programs View</div>
+                    <div class="permission restricted">❌ Administrative Access</div>
+                    <div class="permission restricted">❌ Other User Data</div>
+                    <div class="permission restricted">❌ Management Features</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Getting Started -->
+        <div class="section" id="getting-started">
+            <h2>🚀 Getting Started</h2>
+
+            <h3>🔐 Demo Credentials</h3>
+            <p>Use these credentials to test the system with different user roles:</p>
+
+            <table class="credentials-table">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Access Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Pastor</strong></td>
+                        <td>pastor@church.com</td>
+                        <td>password</td>
+                        <td>Full Access + Subscription</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Worker</strong></td>
+                        <td>worker@church.com</td>
+                        <td>password</td>
+                        <td>Mid-Level Access</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Member</strong></td>
+                        <td>member@church.com</td>
+                        <td>password</td>
+                        <td>View & Limited Input</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Newcomer</strong></td>
+                        <td>newcomer@church.com</td>
+                        <td>password</td>
+                        <td>Basic Information Only</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>📝 First-Time Setup</h3>
+            <ol class="step-list">
+                <li><strong>Login as Pastor:</strong> Use pastor credentials to access full system</li>
+                <li><strong>Activate Subscription:</strong> Complete payment to unlock all features</li>
+                <li><strong>Configure Church Settings:</strong> Set church name, address, and preferences</li>
+                <li><strong>Invite Users:</strong> Send invitations to workers and members</li>
+                <li><strong>Create Initial Data:</strong> Add programs, folders, and basic information</li>
+            </ol>
+
+            <div class="warning">
+                <h4>⚠️ Important Security Notes</h4>
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>Change default passwords immediately in production</li>
+                    <li>Only share Pastor credentials with authorized church leadership</li>
+                    <li>Regularly review user access and permissions</li>
+                    <li>Keep subscription active to maintain data access</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Feature Modules Overview -->
+        <div class="section" id="modules">
+            <h2>📦 Feature Modules Overview</h2>
+            <p>The Church Management System includes 10 comprehensive modules designed to handle all aspects of church operations:</p>
+
+            <div class="module-overview">
+                <div class="module-card">
+                    <div class="icon">🗃️</div>
+                    <h4>Folders Module</h4>
+                    <p>Organize programs and resources with collaborative commenting</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">🗣️</div>
+                    <h4>PD Summary</h4>
+                    <p>Pastor's Desk summaries and service directives</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">📅</div>
+                    <h4>Calendar</h4>
+                    <p>Event scheduling with reminders and categorization</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">✅</div>
+                    <h4>Tasks</h4>
+                    <p>Task assignment and completion tracking</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">🙋‍♂️</div>
+                    <h4>Newcomers</h4>
+                    <p>New visitor information and follow-up</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">📖</div>
+                    <h4>Programs</h4>
+                    <p>Church programs and attendance tracking</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">🧾</div>
+                    <h4>Souls Won</h4>
+                    <p>Track conversions and spiritual decisions</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">💬</div>
+                    <h4>History</h4>
+                    <p>Complete audit trail and feedback system</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">⚙️</div>
+                    <h4>Settings</h4>
+                    <p>Church configuration and user management</p>
+                </div>
+                <div class="module-card">
+                    <div class="icon">📊</div>
+                    <h4>Dashboard</h4>
+                    <p>Role-based overview and quick actions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Folders Module -->
+        <div class="section" id="folders">
+            <h2>🗃️ Folders Module</h2>
+            <p>The Folders Module allows Pastors and Workers to organize church programs and resources into categorized folders with collaborative features.</p>
+
+            <h3>📁 Folder Types</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Foundation Folders</h4>
+                    <p>Basic Christian foundation courses and materials</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Integration Folders</h4>
+                    <p>Programs to integrate new members into church life</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Custom Folders</h4>
+                    <p>User-defined categories for specific church needs</p>
+                </div>
+            </div>
+
+            <h3>💬 Collaboration Features</h3>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Comments:</strong> General discussion and feedback</li>
+                <li><strong>Service Notes:</strong> Notes from specific services or events</li>
+                <li><strong>PD Notes:</strong> Pastor's Desk directives and instructions</li>
+                <li><strong>Internal Updates:</strong> Administrative updates and announcements</li>
+            </ul>
+
+            <h3>🔧 How to Use</h3>
+            <ol class="step-list">
+                <li><strong>Create Folder:</strong> Click "Create Folder" and choose type and description</li>
+                <li><strong>Add Content:</strong> Click on any folder to view and add comments</li>
+                <li><strong>Collaborate:</strong> Use different note types for organized communication</li>
+                <li><strong>Track History:</strong> All comments are timestamped with author information</li>
+            </ol>
+        </div>
+
+        <!-- PD Summary Module -->
+        <div class="section" id="pd-summary">
+            <h2>🗣️ PD Summary Module</h2>
+            <p>The Pastor's Desk (PD) Summary Module facilitates communication between Pastors and Workers through service summaries and directives.</p>
+
+            <h3>📋 Summary Types</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Service Reports</h4>
+                    <p>Workers submit detailed reports about services and programs</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Pastor Directives</h4>
+                    <p>Pastors send instructions and guidance to workers</p>
+                </div>
+            </div>
+
+            <h3>🎯 Key Features</h3>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Service Date Tracking:</strong> Link summaries to specific service dates</li>
+                <li><strong>Target Audience:</strong> Send directives to all staff or specific roles</li>
+                <li><strong>Rich Content:</strong> Detailed descriptions and instructions</li>
+                <li><strong>Author Attribution:</strong> Clear identification of who created each summary</li>
+            </ul>
+
+            <h3>📝 Workflow</h3>
+            <ol class="step-list">
+                <li><strong>Workers Submit Reports:</strong> After services, workers create detailed reports</li>
+                <li><strong>Pastor Reviews:</strong> Pastor reviews all submitted reports</li>
+                <li><strong>Pastor Creates Directives:</strong> Based on reports, pastor sends guidance</li>
+                <li><strong>Workers Receive Instructions:</strong> Workers see new directives in their dashboard</li>
+            </ol>
+        </div>
+
+        <!-- Calendar Module -->
+        <div class="section" id="calendar">
+            <h2>📅 Calendar Module</h2>
+            <p>The Calendar Module provides comprehensive event scheduling and management capabilities for church activities.</p>
+
+            <h3>📊 Event Categories</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Services</h4>
+                    <p>Regular worship services and special services</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Meetings</h4>
+                    <p>Staff meetings, committee meetings, and planning sessions</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Events</h4>
+                    <p>Special church events, conferences, and celebrations</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Appointments</h4>
+                    <p>Personal appointments and counseling sessions</p>
+                </div>
+            </div>
+
+            <h3>⏰ Advanced Features</h3>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Reminders:</strong> Set reminders 15 minutes to 1 day before events</li>
+                <li><strong>Recurring Events:</strong> Schedule repeating services and meetings</li>
+                <li><strong>Attendee Management:</strong> Track who's invited and attending</li>
+                <li><strong>Color Coding:</strong> Visual categorization by event type</li>
+            </ul>
+
+            <h3>📱 Calendar Views</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Monthly Grid</h4>
+                    <p>Traditional calendar view with events displayed by date</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Upcoming Events</h4>
+                    <p>List view of upcoming events with details and actions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Module -->
+        <div class="section" id="tasks">
+            <h2>✅ Tasks Module</h2>
+            <p>The Tasks Module enables Pastors to assign tasks to Workers and track completion with feedback mechanisms.</p>
+
+            <h3>📋 Task Management</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Task Assignment</h4>
+                    <p>Pastors assign tasks with descriptions, due dates, and priorities</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Status Tracking</h4>
+                    <p>Track tasks through pending, in-progress, and completed states</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Priority Levels</h4>
+                    <p>Set high, medium, or low priority for proper task management</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Completion Feedback</h4>
+                    <p>Workers provide feedback when marking tasks as complete</p>
+                </div>
+            </div>
+
+            <h3>🔄 Task Workflow</h3>
+            <ol class="step-list">
+                <li><strong>Pastor Creates Task:</strong> Assign task with details and deadline</li>
+                <li><strong>Worker Receives Notification:</strong> Task appears in worker's dashboard</li>
+                <li><strong>Worker Starts Task:</strong> Change status to "in progress"</li>
+                <li><strong>Worker Completes Task:</strong> Mark complete with optional feedback</li>
+                <li><strong>Pastor Reviews:</strong> See completion status and feedback</li>
+            </ol>
+
+            <h3>📊 Task Statistics</h3>
+            <p>The module provides real-time statistics including:</p>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li>Total tasks assigned</li>
+                <li>Pending tasks count</li>
+                <li>In-progress tasks</li>
+                <li>Completed tasks with feedback</li>
+            </ul>
+        </div>
+
+        <!-- Newcomer Management -->
+        <div class="section" id="newcomers">
+            <h2>🙋‍♂️ Newcomer Management</h2>
+            <p>The Newcomer Management system helps churches welcome and track new visitors with comprehensive information collection.</p>
+
+            <h3>📝 Information Collection</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Personal Details</h4>
+                    <p>Name, age, contact information, and address</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Visit Information</h4>
+                    <p>First visit date, how they found the church, referral source</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Follow-up Notes</h4>
+                    <p>Additional information and special requests</p>
+                </div>
+                <div class="feature-card">
+                    <h4>First-Timer Tracking</h4>
+                    <p>Special identification for first-time visitors</p>
+                </div>
+            </div>
+
+            <h3>🎯 Follow-up Process</h3>
+            <ol class="step-list">
+                <li><strong>Newcomer Submits Form:</strong> Complete information during or after visit</li>
+                <li><strong>Confirmation Message:</strong> Immediate acknowledgment of submission</li>
+                <li><strong>Staff Notification:</strong> Workers and Pastor receive newcomer alerts</li>
+                <li><strong>Follow-up Contact:</strong> Designated staff member reaches out within 24-48 hours</li>
+                <li><strong>Integration Process:</strong> Guide newcomer through church programs and community</li>
+            </ol>
+
+            <h3>📊 Newcomer Analytics</h3>
+            <p>Track important metrics including:</p>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li>Weekly and monthly newcomer counts</li>
+                <li>Referral source analysis</li>
+                <li>First-timer vs. returning visitor ratios</li>
+                <li>Follow-up completion rates</li>
+            </ul>
+        </div>
+
+        <!-- Programs & Attendance -->
+        <div class="section" id="programs">
+            <h2>📖 Programs & Attendance</h2>
+            <p>Comprehensive management of church programs and detailed attendance tracking for all church activities.</p>
+
+            <h3>🎪 Program Types</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Sunday Services</h4>
+                    <p>Regular worship services and special Sunday events</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Crusades</h4>
+                    <p>Evangelistic events and outreach programs</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Bible Studies</h4>
+                    <p>Weekly Bible study sessions and discipleship programs</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Youth Programs</h4>
+                    <p>Youth-focused activities and ministry events</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Prayer Meetings</h4>
+                    <p>Prayer services and intercession gatherings</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Special Events</h4>
+                    <p>Conferences, seminars, and celebration events</p>
+                </div>
+            </div>
+
+            <h3>📊 Attendance Tracking</h3>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Participant Types:</strong> Members, Newcomers, and Visitors</li>
+                <li><strong>Time Tracking:</strong> Arrival times and duration</li>
+                <li><strong>Program Linking:</strong> Connect attendance to specific programs</li>
+                <li><strong>Real-time Statistics:</strong> Live attendance counts and trends</li>
+            </ul>
+
+            <h3>📈 Reporting Features</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Daily Reports</h4>
+                    <p>Today's attendance across all programs</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Weekly Trends</h4>
+                    <p>Week-over-week attendance analysis</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Program Analysis</h4>
+                    <p>Compare attendance across different program types</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Growth Tracking</h4>
+                    <p>Long-term attendance growth and patterns</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Souls Won Tracker -->
+        <div class="section" id="souls">
+            <h2>🧾 Souls Won Tracker</h2>
+            <p>Track spiritual decisions and conversions during church programs with detailed follow-up information.</p>
+
+            <h3>📋 Decision Tracking</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Personal Information</h4>
+                    <p>Name, age, contact details of new converts</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Program Context</h4>
+                    <p>Which program or event led to the decision</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Counselor Details</h4>
+                    <p>Who provided counseling and guidance</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Follow-up Notes</h4>
+                    <p>Additional information and next steps</p>
+                </div>
+            </div>
+
+            <h3>📊 Conversion Analytics</h3>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Monthly Totals:</strong> Track souls won each month</li>
+                <li><strong>Program Effectiveness:</strong> Which programs yield the most conversions</li>
+                <li><strong>Counselor Performance:</strong> Track counseling effectiveness</li>
+                <li><strong>Age Demographics:</strong> Understand age groups responding to ministry</li>
+            </ul>
+
+            <h3>🎯 Follow-up Process</h3>
+            <ol class="step-list">
+                <li><strong>Record Decision:</strong> Immediately log the spiritual decision</li>
+                <li><strong>Collect Information:</strong> Gather contact details and background</li>
+                <li><strong>Assign Counselor:</strong> Connect with appropriate follow-up counselor</li>
+                <li><strong>Schedule Follow-up:</strong> Plan next steps and continued support</li>
+                <li><strong>Track Progress:</strong> Monitor spiritual growth and church integration</li>
+            </ol>
+        </div>
+
+        <!-- History & Feedback -->
+        <div class="section" id="history">
+            <h2>💬 History & Feedback</h2>
+            <p>Comprehensive audit trail and feedback system for all church activities and communications.</p>
+
+            <h3>📚 History Types</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>PD Notes</h4>
+                    <p>All Pastor's Desk summaries and directives</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Task Feedback</h4>
+                    <p>Completion feedback and task communications</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Comments</h4>
+                    <p>All folder comments and collaborative discussions</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Meeting Notes</h4>
+                    <p>Records from meetings and planning sessions</p>
+                </div>
+            </div>
+
+            <h3>🔍 Search & Filter</h3>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Date Range Filtering:</strong> Find entries from specific time periods</li>
+                <li><strong>Type Filtering:</strong> Filter by entry type (PD notes, tasks, etc.)</li>
+                <li><strong>Author Search:</strong> Find entries by specific authors</li>
+                <li><strong>Content Search:</strong> Search within entry content</li>
+            </ul>
+
+            <h3>📤 Export Options</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>PDF Export</h4>
+                    <p>Generate formatted PDF reports</p>
+                </div>
+                <div class="feature-card">
+                    <h4>CSV Export</h4>
+                    <p>Export data for spreadsheet analysis</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Weekly Reports</h4>
+                    <p>Automated weekly summary reports</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Custom Reports</h4>
+                    <p>Create custom reports with specific criteria</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings & Configuration -->
+        <div class="section" id="settings">
+            <h2>⚙️ Settings & Configuration</h2>
+            <p>Comprehensive settings for church customization, user management, and system configuration.</p>
+
+            <h3>🏛️ Church Settings</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Basic Information</h4>
+                    <p>Church name, address, phone, and email</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Visual Customization</h4>
+                    <p>Logo, primary colors, and font selection</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Language Settings</h4>
+                    <p>Multi-language support and localization</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Subscription Management</h4>
+                    <p>Payment status and subscription details</p>
+                </div>
+            </div>
+
+            <h3>👥 User Management</h3>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>User Invitations:</strong> Send email invitations to new users</li>
+                <li><strong>Role Assignment:</strong> Set appropriate roles for each user</li>
+                <li><strong>Department Organization:</strong> Organize users by ministry departments</li>
+                <li><strong>Access Control:</strong> Manage permissions and access levels</li>
+            </ul>
+
+            <h3>🎨 Customization Options</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Color Themes</h4>
+                    <p>8 pre-defined color schemes to match church branding</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Font Selection</h4>
+                    <p>6 professional font options for optimal readability</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Logo Upload</h4>
+                    <p>Custom church logo integration</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Layout Options</h4>
+                    <p>Responsive design adapts to all devices</p>
+                </div>
+            </div>
+
+            <h3>🌍 Multi-Language Support</h3>
+            <p>The system supports the following languages:</p>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li>🇺🇸 English</li>
+                <li>🇩🇪 German (Deutsch)</li>
+                <li>🇫🇷 French (Français)</li>
+                <li>🇪🇸 Spanish (Español)</li>
+                <li>🇵🇹 Portuguese (Português)</li>
+            </ul>
+        </div>
+
+        <!-- Support & Troubleshooting -->
+        <div class="section" id="support">
+            <h2>🆘 Support & Troubleshooting</h2>
+
+            <h3>📞 Getting Help</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Email Support</h4>
+                    <p>support@churchapp.com<br>Response within 24 hours</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Phone Support</h4>
+                    <p>+49 000000000<br>Monday-Friday, 9 AM - 5 PM</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Priority Support</h4>
+                    <p>Included with subscription<br>Faster response times</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Documentation</h4>
+                    <p>This manual and online help<br>Available 24/7</p>
+                </div>
+            </div>
+
+            <h3>🔧 Common Issues</h3>
+            
+            <h4>Login Problems</h4>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Forgot Password:</strong> Contact your Pastor for password reset</li>
+                <li><strong>Account Locked:</strong> Wait 15 minutes or contact support</li>
+                <li><strong>Role Issues:</strong> Verify your role assignment with church administrator</li>
+            </ul>
+
+            <h4>Subscription Issues</h4>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Payment Failed:</strong> Check payment method and retry</li>
+                <li><strong>Access Denied:</strong> Ensure subscription is active and current</li>
+                <li><strong>Billing Questions:</strong> Contact support with subscription details</li>
+            </ul>
+
+            <h4>Data Issues</h4>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Missing Data:</strong> Check user permissions and role access</li>
+                <li><strong>Sync Problems:</strong> Refresh browser and check internet connection</li>
+                <li><strong>Export Issues:</strong> Ensure popup blockers are disabled</li>
+            </ul>
+
+            <h3>💡 Best Practices</h3>
+            <div class="info">
+                <h4>System Optimization</h4>
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>Use modern browsers (Chrome, Firefox, Safari, Edge)</li>
+                    <li>Keep browser updated to latest version</li>
+                    <li>Clear browser cache if experiencing issues</li>
+                    <li>Ensure stable internet connection for best performance</li>
+                    <li>Regular data backups through export features</li>
+                </ul>
+            </div>
+
+            <h3>🔄 System Updates</h3>
+            <p>The Church Management System receives regular updates including:</p>
+            <ul style="margin: 15px 0; padding-left: 30px;">
+                <li><strong>Security Updates:</strong> Regular security patches and improvements</li>
+                <li><strong>Feature Enhancements:</strong> New features based on user feedback</li>
+                <li><strong>Bug Fixes:</strong> Resolution of reported issues</li>
+                <li><strong>Performance Improvements:</strong> Speed and reliability enhancements</li>
+            </ul>
+
+            <div class="warning">
+                <h4>⚠️ Data Security</h4>
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>Never share login credentials with unauthorized persons</li>
+                    <li>Log out when using shared computers</li>
+                    <li>Report suspicious activity immediately</li>
+                    <li>Keep subscription active to maintain data access</li>
+                    <li>Regular data exports for backup purposes</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3>⛪ Church Management System</h3>
+            <p>Empowering churches with modern technology for effective ministry</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                Version 1.0 | 2025 | For support: support@churchapp.com | +49 000000000
+            </p>
+            <p style="margin-top: 10px; font-size: 0.8em; opacity: 0.7;">
+                This manual covers all features and functionality of the Church Management System.<br>
+                For the latest updates and additional resources, visit our support portal.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
