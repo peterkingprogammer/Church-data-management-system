@@ -1,5 +1,7 @@
-import React from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useEffect, useState } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { useLanguage } from '../contexts/LanguageContext'
+import { supabase } from '../lib/supabase'
 import { 
   Users, 
   Calendar, 
@@ -10,66 +12,192 @@ import {
   TrendingUp,
   Clock,
   Award,
-  Target
-} from 'lucide-react';
+  Target,
+  Bell,
+  UserCheck,
+  FileBarChart
+} from 'lucide-react'
+
+interface DashboardStats {
+  todayAttendance: number
+  weeklyAttendance: number
+  pendingTasks: number
+  activeNotices: number
+  soulsWon: number
+  newVisitors: number
+  activePrograms: number
+  myAttendance: number
+  myExcuses: number
+  churchNotices: number
+}
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user } = useAuth()
+  const { t } = useLanguage()
+  const [stats, setStats] = useState<DashboardStats>({
+    todayAttendance: 0,
+    weeklyAttendance: 0,
+    pendingTasks: 0,
+    activeNotices: 0,
+    soulsWon: 0,
+    newVisitors: 0,
+    activePrograms: 0,
+    myAttendance: 0,
+    myExcuses: 0,
+    churchNotices: 0
+  })
+  const [recentActivity, setRecentActivity] = useState<any[]>([])
+  const [upcomingEvents, setUpcomingEvents] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData()
+    }
+  }, [user])
+
+  const fetchDashboardData = async () => {
+    try {
+      // Fetch stats based on user role
+      const today = new Date().toISOString().split('T')[0]
+      const weekStart = new Date()
+      weekStart.setDate(weekStart.getDate() - 7)
+
+      // Common queries
+      const [attendanceToday, attendanceWeek, tasks, notices] = await Promise.all([
+        supabase.from('attendance').select('*').eq('date', today),
+        supabase.from('attendance').select('*').gte('date', weekStart.toISOString().split('T')[0]),
+        supabase.from('tasks').select('*').eq('is_completed', false),
+        supabase.from('notices').select('*').eq('status', 'active')
+      ])
+
+      const newStats: DashboardStats = {
+        todayAttendance: attendanceToday.data?.length || 0,
+        weeklyAttendance: attendanceWeek.data?.length || 0,
+        pendingTasks: tasks.data?.length || 0,
+        activeNotices: notices.data?.length || 0,
+        soulsWon: 0,
+        newVisitors: 0,
+        activePrograms: 0,
+        myAttendance: 0,
+        myExcuses: 0,
+        churchNotices: notices.data?.length || 0
+      }
+
+      // Role-specific data
+      if (user?.role === 'pastor' || user?.role === 'worker') {
+        const [souls, visitors, programs] = await Promise.all([
+          supabase.from('souls_won').select('*'),
+          supabase.from('follow_ups').select('*').eq('status', 'pending'),
+          supabase.from('programs').select('*').eq('status', 'active')
+        ])
+
+        newStats.soulsWon = souls.data?.length || 0
+        newStats.newVisitors = visitors.data?.length || 0
+        newStats.activePrograms = programs.data?.length || 0
+      }
+
+      if (user?.role === 'member') {
+        const [myAttendance, myExcuses] = await Promise.all([
+          supabase.from('attendance').select('*').eq('user_id', user.id),
+          supabase.from('excuses').select('*').eq('user_id', user.id)
+        ])
+
+        newStats.myAttendance = myAttendance.data?.length || 0
+        newStats.myExcuses = myExcuses.data?.length || 0
+      }
+
+      setStats(newStats)
+
+      // Fetch recent activity (simplified)
+      setRecentActivity([
+        { action: 'John Doe marked attendance', time: '2 hours ago', type: 'attendance' },
+        { action: 'Pastor John sent church notice', time: '3 hours ago', type: 'notice' },
+        { action: 'Mary Johnson submitted excuse', time: '4 hours ago', type: 'excuse' },
+        { action: 'David Wilson completed task', time: '1 day ago', type: 'task' }
+      ])
+
+      // Fetch upcoming events (simplified)
+      setUpcomingEvents([
+        { name: 'Sunday Morning Service', date: 'Tomorrow', time: '10:00 AM', type: 'service' },
+        { name: 'Bible Study', date: 'Wednesday', time: '7:00 PM', type: 'study' },
+        { name: 'Youth Meeting', date: 'Friday', time: '6:00 PM', type: 'youth' },
+        { name: 'Prayer Meeting', date: 'Saturday', time: '8:00 AM', type: 'prayer' }
+      ])
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const getWelcomeMessage = () => {
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    const hour = new Date().getHours()
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
     
     switch (user?.role) {
       case 'pastor':
-        return `${greeting}, Pastor ${user.full_name}`;
+        return `${greeting}, Pastor ${user.full_name?.split(' ')[0]}!`
       case 'worker':
-        return `${greeting}, ${user.full_name}`;
+        return `${greeting}, ${user.full_name?.split(' ')[0]}!`
       case 'member':
-        return `${greeting}, ${user.full_name}`;
+        return `${greeting}, ${user.full_name?.split(' ')[0]}!`
       case 'newcomer':
-        return `Welcome to our church, ${user.full_name}!`;
+        return `Welcome to our church, ${user.full_name?.split(' ')[0]}!`
       default:
-        return `${greeting}, ${user?.full_name}`;
+        return `${greeting}, ${user?.full_name?.split(' ')[0]}!`
     }
-  };
+  }
 
   const getQuickStats = () => {
     if (user?.role === 'pastor' || user?.role === 'worker') {
       return [
-        { name: 'Total Members', value: '156', icon: Users, change: '+12%', changeType: 'increase' },
-        { name: 'This Week\'s Attendance', value: '89', icon: Calendar, change: '+5%', changeType: 'increase' },
-        { name: 'Active Programs', value: '12', icon: BookOpen, change: '+2', changeType: 'increase' },
-        { name: 'Souls Won This Month', value: '8', icon: Heart, change: '+3', changeType: 'increase' },
-      ];
+        { name: t('dashboard.today_attendance'), value: stats.todayAttendance.toString(), icon: Users, change: '+5%', changeType: 'increase' },
+        { name: t('dashboard.weekly_attendance'), value: stats.weeklyAttendance.toString(), icon: Calendar, change: '+12%', changeType: 'increase' },
+        { name: t('dashboard.pending_tasks'), value: stats.pendingTasks.toString(), icon: CheckSquare, change: '-2', changeType: 'decrease' },
+        { name: t('dashboard.active_notices'), value: stats.activeNotices.toString(), icon: Bell, change: '+1', changeType: 'increase' }
+      ]
     }
-    return [];
-  };
 
-  const getRecentActivity = () => {
-    if (user?.role === 'pastor' || user?.role === 'worker') {
+    if (user?.role === 'member') {
       return [
-        { action: 'New member registered', user: 'Sarah Johnson', time: '2 hours ago', type: 'member' },
-        { action: 'Task completed', user: 'Mary Wilson', time: '4 hours ago', type: 'task' },
-        { action: 'Program attendance recorded', user: 'Bible Study', time: '1 day ago', type: 'program' },
-        { action: 'Newcomer form submitted', user: 'David Brown', time: '2 days ago', type: 'newcomer' },
-      ];
+        { name: 'My Attendance', value: stats.myAttendance.toString(), icon: UserCheck, change: '+2', changeType: 'increase' },
+        { name: 'This Month', value: '4', icon: Calendar, change: 'Times attended', changeType: 'neutral' },
+        { name: t('dashboard.church_notices'), value: stats.churchNotices.toString(), icon: Bell, change: 'Active notices', changeType: 'neutral' },
+        { name: 'My Excuses', value: stats.myExcuses.toString(), icon: UserPlus, change: 'Submitted excuses', changeType: 'neutral' }
+      ]
     }
-    return [];
-  };
 
-  const getUpcomingEvents = () => {
-    return [
-      { name: 'Sunday Morning Service', date: 'Tomorrow', time: '10:00 AM', type: 'service' },
-      { name: 'Bible Study', date: 'Wednesday', time: '7:00 PM', type: 'study' },
-      { name: 'Youth Meeting', date: 'Friday', time: '6:00 PM', type: 'youth' },
-      { name: 'Prayer Meeting', date: 'Saturday', time: '8:00 AM', type: 'prayer' },
-    ];
-  };
+    if (user?.role === 'newcomer') {
+      return [
+        { name: 'Welcome!', value: '👋', icon: Heart, change: 'Complete your profile', changeType: 'neutral' },
+        { name: 'Programs', value: '3', icon: BookOpen, change: 'Available events', changeType: 'neutral' }
+      ]
+    }
 
-  const quickStats = getQuickStats();
-  const recentActivity = getRecentActivity();
-  const upcomingEvents = getUpcomingEvents();
+    return []
+  }
+
+  const quickStats = getQuickStats()
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6">
@@ -79,7 +207,15 @@ export default function Dashboard() {
           {getWelcomeMessage()}
         </h1>
         <p className="text-gray-600">
-          Here's what's happening at {user?.church_name || 'your church'} today.
+          {t('dashboard.overview')}
+        </p>
+        <p className="text-sm text-gray-500 mt-1">
+          {new Date().toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
         </p>
       </div>
 
@@ -93,11 +229,11 @@ export default function Dashboard() {
             </h2>
           </div>
           <p className="text-blue-800 mb-4">
-            We're so glad you're here. Please take a moment to complete your newcomer information 
+            We're so glad you're here. Please take a moment to complete your information 
             so we can better serve you and help you get connected.
           </p>
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-            Complete Your Profile
+            {t('action.complete_profile')}
           </button>
         </div>
       )}
@@ -106,7 +242,7 @@ export default function Dashboard() {
       {quickStats.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {quickStats.map((stat) => {
-            const Icon = stat.icon;
+            const Icon = stat.icon
             return (
               <div key={stat.name} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between">
@@ -121,10 +257,9 @@ export default function Dashboard() {
                 <div className="mt-4 flex items-center">
                   <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
                   <span className="text-sm text-green-600 font-medium">{stat.change}</span>
-                  <span className="text-sm text-gray-500 ml-1">from last month</span>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       )}
@@ -133,7 +268,7 @@ export default function Dashboard() {
         {/* Upcoming Events */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Upcoming Events</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.upcoming_events')}</h3>
             <Calendar className="h-5 w-5 text-gray-400" />
           </div>
           <div className="space-y-4">
@@ -152,11 +287,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        {recentActivity.length > 0 && (
+        {/* Recent Activity or Quick Actions */}
+        {(user?.role === 'pastor' || user?.role === 'worker') ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.recent_activity')}</h3>
               <Clock className="h-5 w-5 text-gray-400" />
             </div>
             <div className="space-y-4">
@@ -164,43 +299,49 @@ export default function Dashboard() {
                 <div key={index} className="flex items-start space-x-3">
                   <div className="flex-shrink-0">
                     <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      {activity.type === 'member' && <Users className="h-4 w-4 text-blue-600" />}
+                      {activity.type === 'attendance' && <UserCheck className="h-4 w-4 text-blue-600" />}
+                      {activity.type === 'notice' && <Bell className="h-4 w-4 text-blue-600" />}
+                      {activity.type === 'excuse' && <UserPlus className="h-4 w-4 text-blue-600" />}
                       {activity.type === 'task' && <CheckSquare className="h-4 w-4 text-blue-600" />}
-                      {activity.type === 'program' && <BookOpen className="h-4 w-4 text-blue-600" />}
-                      {activity.type === 'newcomer' && <UserPlus className="h-4 w-4 text-blue-600" />}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                    <p className="text-sm text-gray-600">{activity.user}</p>
                     <p className="text-xs text-gray-500">{activity.time}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        )}
-
-        {/* Quick Actions for Members/Newcomers */}
-        {(user?.role === 'member' || user?.role === 'newcomer') && (
+        ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.quick_actions')}</h3>
               <Target className="h-5 w-5 text-gray-400" />
             </div>
             <div className="space-y-3">
-              <button className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                <span className="font-medium text-blue-900">Mark Today's Attendance</span>
-                <CheckSquare className="h-5 w-5 text-blue-600" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                <span className="font-medium text-green-900">View Church Programs</span>
-                <BookOpen className="h-5 w-5 text-green-600" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                <span className="font-medium text-purple-900">Update Profile</span>
-                <Users className="h-5 w-5 text-purple-600" />
-              </button>
+              {user?.role === 'member' && (
+                <>
+                  <button className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                    <span className="font-medium text-blue-900">{t('action.mark_attendance')}</span>
+                    <CheckSquare className="h-5 w-5 text-blue-600" />
+                  </button>
+                  <button className="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                    <span className="font-medium text-green-900">{t('action.view_notices')}</span>
+                    <Bell className="h-5 w-5 text-green-600" />
+                  </button>
+                  <button className="w-full flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                    <span className="font-medium text-purple-900">{t('action.submit_excuse')}</span>
+                    <UserPlus className="h-5 w-5 text-purple-600" />
+                  </button>
+                </>
+              )}
+              {user?.role === 'newcomer' && (
+                <button className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                  <span className="font-medium text-blue-900">{t('action.complete_profile')}</span>
+                  <Users className="h-5 w-5 text-blue-600" />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -226,6 +367,22 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Church Information */}
+      <div className="mt-8 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('dashboard.church_information')}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-medium text-gray-700 mb-2">Address</h4>
+            <p className="text-gray-600">Add Church Address Here</p>
+          </div>
+          <div>
+            <h4 className="font-medium text-gray-700 mb-2">Contact</h4>
+            <p className="text-gray-600">Add Church phone Here</p>
+            <p className="text-gray-600">Add Church Email Here</p>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+  )
 }
