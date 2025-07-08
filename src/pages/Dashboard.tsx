@@ -1,6 +1,5 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
 import { 
   Users, 
   Calendar, 
@@ -8,170 +7,225 @@ import {
   UserPlus, 
   BookOpen, 
   Heart,
-  History,
-  Settings,
-  LogOut,
-  Church
+  TrendingUp,
+  Clock,
+  Award,
+  Target
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
-  const { t } = useLanguage();
-
-  const handleLogout = () => {
-    logout();
-  };
+  const { user } = useAuth();
 
   const getWelcomeMessage = () => {
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    
     switch (user?.role) {
       case 'pastor':
-        return `Welcome back, Pastor ${user.full_name}`;
+        return `${greeting}, Pastor ${user.full_name}`;
       case 'worker':
-        return `Welcome back, ${user.full_name}`;
+        return `${greeting}, ${user.full_name}`;
       case 'member':
-        return `Welcome, ${user.full_name}`;
+        return `${greeting}, ${user.full_name}`;
       case 'newcomer':
         return `Welcome to our church, ${user.full_name}!`;
       default:
-        return `Welcome, ${user?.full_name}`;
+        return `${greeting}, ${user?.full_name}`;
     }
   };
 
-  const getAvailableModules = () => {
-    const allModules = [
-      { name: 'Folders', icon: Users, description: 'Organize church programs and resources' },
-      { name: 'Calendar', icon: Calendar, description: 'Schedule and manage church events' },
-      { name: 'Tasks', icon: CheckSquare, description: 'Assign and track tasks' },
-      { name: 'Newcomers', icon: UserPlus, description: 'Manage new visitors' },
-      { name: 'Programs', icon: BookOpen, description: 'Church programs and attendance' },
-      { name: 'Souls Won', icon: Heart, description: 'Track spiritual decisions' },
-      { name: 'History', icon: History, description: 'View activity history' },
-      { name: 'Settings', icon: Settings, description: 'Configure church settings' }
+  const getQuickStats = () => {
+    if (user?.role === 'pastor' || user?.role === 'worker') {
+      return [
+        { name: 'Total Members', value: '156', icon: Users, change: '+12%', changeType: 'increase' },
+        { name: 'This Week\'s Attendance', value: '89', icon: Calendar, change: '+5%', changeType: 'increase' },
+        { name: 'Active Programs', value: '12', icon: BookOpen, change: '+2', changeType: 'increase' },
+        { name: 'Souls Won This Month', value: '8', icon: Heart, change: '+3', changeType: 'increase' },
+      ];
+    }
+    return [];
+  };
+
+  const getRecentActivity = () => {
+    if (user?.role === 'pastor' || user?.role === 'worker') {
+      return [
+        { action: 'New member registered', user: 'Sarah Johnson', time: '2 hours ago', type: 'member' },
+        { action: 'Task completed', user: 'Mary Wilson', time: '4 hours ago', type: 'task' },
+        { action: 'Program attendance recorded', user: 'Bible Study', time: '1 day ago', type: 'program' },
+        { action: 'Newcomer form submitted', user: 'David Brown', time: '2 days ago', type: 'newcomer' },
+      ];
+    }
+    return [];
+  };
+
+  const getUpcomingEvents = () => {
+    return [
+      { name: 'Sunday Morning Service', date: 'Tomorrow', time: '10:00 AM', type: 'service' },
+      { name: 'Bible Study', date: 'Wednesday', time: '7:00 PM', type: 'study' },
+      { name: 'Youth Meeting', date: 'Friday', time: '6:00 PM', type: 'youth' },
+      { name: 'Prayer Meeting', date: 'Saturday', time: '8:00 AM', type: 'prayer' },
     ];
-
-    // Filter modules based on user role
-    switch (user?.role) {
-      case 'pastor':
-        return allModules; // Pastor has access to all modules
-      case 'worker':
-        return allModules.filter(m => m.name !== 'Settings'); // Worker has access to most modules
-      case 'member':
-        return allModules.filter(m => ['Programs', 'Calendar'].includes(m.name)); // Member has limited access
-      case 'newcomer':
-        return allModules.filter(m => m.name === 'Programs'); // Newcomer has very limited access
-      default:
-        return [];
-    }
   };
+
+  const quickStats = getQuickStats();
+  const recentActivity = getRecentActivity();
+  const upcomingEvents = getUpcomingEvents();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="p-6">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Church className="h-8 w-8 text-blue-600 mr-3" />
-              <h1 className="text-xl font-semibold text-gray-900">
-                {t('app.title')}
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                {user?.church_name}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-              >
-                <LogOut className="h-4 w-4 mr-1" />
-                {t('nav.logout')}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {getWelcomeMessage()}
+        </h1>
+        <p className="text-gray-600">
+          Here's what's happening at {user?.church_name || 'your church'} today.
+        </p>
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {getWelcomeMessage()}
-          </h2>
-          <p className="text-gray-600">
-            Role: <span className="capitalize font-medium">{user?.role}</span>
-          </p>
-        </div>
-
-        {/* Role-specific content */}
-        {user?.role === 'newcomer' && (
-          <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+      {/* Role-specific welcome message for newcomers */}
+      {user?.role === 'newcomer' && (
+        <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-center mb-4">
+            <UserPlus className="h-8 w-8 text-blue-600 mr-3" />
+            <h2 className="text-xl font-semibold text-blue-900">
               Welcome to our church family!
-            </h3>
-            <p className="text-blue-800">
-              We're so glad you're here. Please take a moment to complete your newcomer information 
-              so we can better serve you and help you get connected.
-            </p>
+            </h2>
           </div>
-        )}
+          <p className="text-blue-800 mb-4">
+            We're so glad you're here. Please take a moment to complete your newcomer information 
+            so we can better serve you and help you get connected.
+          </p>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+            Complete Your Profile
+          </button>
+        </div>
+      )}
 
-        {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {getAvailableModules().map((module) => {
-            const IconComponent = module.icon;
+      {/* Quick Stats */}
+      {quickStats.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {quickStats.map((stat) => {
+            const Icon = stat.icon;
             return (
-              <div
-                key={module.name}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className="flex items-center mb-4">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <IconComponent className="h-6 w-6 text-blue-600" />
+              <div key={stat.name} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                   </div>
-                  <h3 className="ml-3 text-lg font-semibold text-gray-900">
-                    {module.name}
-                  </h3>
+                  <div className="p-3 bg-blue-100 rounded-lg">
+                    <Icon className="h-6 w-6 text-blue-600" />
+                  </div>
                 </div>
-                <p className="text-gray-600 text-sm">
-                  {module.description}
-                </p>
+                <div className="mt-4 flex items-center">
+                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                  <span className="text-sm text-green-600 font-medium">{stat.change}</span>
+                  <span className="text-sm text-gray-500 ml-1">from last month</span>
+                </div>
               </div>
             );
           })}
         </div>
+      )}
 
-        {/* Quick Stats (for Pastor and Worker) */}
-        {(user?.role === 'pastor' || user?.role === 'worker') && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">Total Members</h4>
-              <p className="text-2xl font-bold text-gray-900">156</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Upcoming Events */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Upcoming Events</h3>
+            <Calendar className="h-5 w-5 text-gray-400" />
+          </div>
+          <div className="space-y-4">
+            {upcomingEvents.map((event, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">{event.name}</p>
+                  <p className="text-sm text-gray-600">{event.date} at {event.time}</p>
+                </div>
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 text-gray-400 mr-1" />
+                  <span className="text-sm text-gray-500">{event.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        {recentActivity.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+              <Clock className="h-5 w-5 text-gray-400" />
             </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">This Week's Attendance</h4>
-              <p className="text-2xl font-bold text-gray-900">89</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">Active Programs</h4>
-              <p className="text-2xl font-bold text-gray-900">12</p>
+            <div className="space-y-4">
+              {recentActivity.map((activity, index) => (
+                <div key={index} className="flex items-start space-x-3">
+                  <div className="flex-shrink-0">
+                    <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      {activity.type === 'member' && <Users className="h-4 w-4 text-blue-600" />}
+                      {activity.type === 'task' && <CheckSquare className="h-4 w-4 text-blue-600" />}
+                      {activity.type === 'program' && <BookOpen className="h-4 w-4 text-blue-600" />}
+                      {activity.type === 'newcomer' && <UserPlus className="h-4 w-4 text-blue-600" />}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                    <p className="text-sm text-gray-600">{activity.user}</p>
+                    <p className="text-xs text-gray-500">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Subscription Notice (for Pastor only) */}
-        {user?.role === 'pastor' && (
-          <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-green-900 mb-2">
-              Subscription Active
-            </h3>
-            <p className="text-green-800">
-              Your church management system is fully activated. All features are available.
-            </p>
+        {/* Quick Actions for Members/Newcomers */}
+        {(user?.role === 'member' || user?.role === 'newcomer') && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+              <Target className="h-5 w-5 text-gray-400" />
+            </div>
+            <div className="space-y-3">
+              <button className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                <span className="font-medium text-blue-900">Mark Today's Attendance</span>
+                <CheckSquare className="h-5 w-5 text-blue-600" />
+              </button>
+              <button className="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                <span className="font-medium text-green-900">View Church Programs</span>
+                <BookOpen className="h-5 w-5 text-green-600" />
+              </button>
+              <button className="w-full flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                <span className="font-medium text-purple-900">Update Profile</span>
+                <Users className="h-5 w-5 text-purple-600" />
+              </button>
+            </div>
           </div>
         )}
-      </main>
+      </div>
+
+      {/* Personal Stats for Members */}
+      {user?.role === 'member' && (
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <Award className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-gray-900">85%</p>
+            <p className="text-sm text-gray-600">Attendance Rate</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <Calendar className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-gray-900">24</p>
+            <p className="text-sm text-gray-600">Services Attended</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+            <BookOpen className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-gray-900">3</p>
+            <p className="text-sm text-gray-600">Programs Joined</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
