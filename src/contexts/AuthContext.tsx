@@ -7,6 +7,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error?: string }>
+  signUp: (email: string, password: string, userData: { full_name: string, role?: string }) => Promise<{ error?: string }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<User>) => Promise<{ error?: string }>
 }
@@ -51,8 +52,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .eq('id', userId)
         .single()
 
-      if (error) throw error
-      setUser(data)
+      if (error) {
+        console.error('Error fetching user profile:', error)
+        // If user doesn't exist in users table, create them as newcomer
+        if (error.code === 'PGRST116') {
+          const { data: authUser } = await supabase.auth.getUser()
+          if (authUser.user) {
+            const { data: newUser, error: insertError } = await supabase
+              .from('users')
+              .insert({
+                id: authUser.user.id,
+                email: authUser.user.email!,
+                full_name: authUser.user.user_metadata?.full_name || authUser.user.email!,
+                role: 'newcomer',
+                language: 'en'
+              })
+              .select()
+              .single()
+
+            if (!insertError && newUser) {
+              setUser(newUser)
+            }
+          }
+        }
+      } else if (data) {
+        setUser(data)
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error)
     } finally {
@@ -62,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      setLoading(true)
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -71,6 +97,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return {}
     } catch (error: any) {
       return { error: error.message }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const signUp = async (email: string, password: string, userData: { full_name: string, role?: string }) => {
+    try {
+      setLoading(true)
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: userData.full_name
+          }
+        }
+      })
+      
+      if (error) throw error
+      return {}
+    } catch (error: any) {
+      return { error: error.message }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -101,6 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session,
     loading,
     signIn,
+    signUp,
     signOut,
     updateProfile
   }
